@@ -44,7 +44,7 @@ df_confirmed_t = df_confirmed.set_index(['Province/State', 'Country/Region']).il
 df_deaths_t = df_deaths.set_index(['Province/State', 'Country/Region']).iloc[:, 2:].T
 df_recovered_t = df_recovered.set_index(['Province/State', 'Country/Region']).iloc[:, 2:].T
 
-# Convert column names to strings before using `.str.split()`
+# Convert MultiIndex columns to strings
 df_confirmed_t.columns = [' | '.join(map(str, col)) for col in df_confirmed_t.columns]
 df_deaths_t.columns = [' | '.join(map(str, col)) for col in df_deaths_t.columns]
 df_recovered_t.columns = [' | '.join(map(str, col)) for col in df_recovered_t.columns]
