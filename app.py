@@ -39,24 +39,24 @@ df_confirmed_total = df_confirmed.iloc[:, 4:].sum(axis=0)
 df_deaths_total = df_deaths.iloc[:, 4:].sum(axis=0)
 df_recovered_total = df_recovered.iloc[:, 4:].sum(axis=0)
 
-df_deaths_confirmed = df_deaths.copy()
-df_deaths_confirmed['confirmed'] = df_confirmed.iloc[:, -1]
+# Aligning data for consistent indexing
+df_confirmed_t = df_confirmed.set_index(df_confirmed.columns[4:]).T
+df_deaths_t = df_deaths.set_index(df_deaths.columns[4:]).T
+df_recovered_t = df_recovered.set_index(df_recovered.columns[4:]).T
 
-# Align `df_deaths_t` and `df_recovered_t` with `df_confirmed_t`
-df_deaths_t = df_deaths.reindex(df_confirmed.index)
-df_recovered_t = df_recovered.reindex(df_confirmed.index)
+# Convert column names to strings before using `.str.split()`
+df_confirmed_t.columns = df_confirmed_t.columns.astype(str).str.split("|", n=1).str[-1]
+df_deaths_t.columns = df_deaths_t.columns.astype(str).str.split("|", n=1).str[-1]
+df_recovered_t.columns = df_recovered_t.columns.astype(str).str.split("|", n=1).str[-1]
 
-# Fix misalignment of `df_active_t`
-df_active_t = df_confirmed_total.subtract(df_deaths_total.add(df_recovered_total))
-df_active_t.clip(lower=0, inplace=True)
-
-# Fix `.str.split()` issue
-df_confirmed_t.columns = df_confirmed_t.columns.astype(str).str.split("|", n=1)
-
-# Ensure consistent indexing
+# Ensure consistent datetime indexing
 df_confirmed_t.index = pd.to_datetime(df_confirmed_t.index)
-df_deaths_t.index = pd.to_datetime(df_confirmed_t.index)
-df_recovered_t.index = pd.to_datetime(df_confirmed_t.index)
+df_deaths_t.index = pd.to_datetime(df_deaths_t.index)
+df_recovered_t.index = pd.to_datetime(df_recovered_t.index)
+
+# Calculate active cases
+df_active_t = df_confirmed_t.subtract(df_deaths_t.add(df_recovered_t, fill_value=0), fill_value=0)
+df_active_t.clip(lower=0, inplace=True)
 
 # Dash App Layout
 app.layout = html.Div([
@@ -71,8 +71,8 @@ app.layout = html.Div([
 
         html.Div([
             html.H4('Active Cases', style={'color': colors['active_text']}),
-            html.P(f"{df_active_t[-1]:,d}", style={'color': colors['active_text'], 'fontSize': 30}),
-            html.P('Past 24hrs increase: +' + f"{df_active_t[-1] - df_active_t[-2]:,d}")
+            html.P(f"{df_active_t.iloc[-1].sum():,d}", style={'color': colors['active_text'], 'fontSize': 30}),
+            html.P('Past 24hrs increase: +' + f"{df_active_t.iloc[-1].sum() - df_active_t.iloc[-2].sum():,d}")
         ], className='three columns'),
 
         html.Div([
