@@ -45,9 +45,9 @@ df_deaths_t = df_deaths.set_index(['Province/State', 'Country/Region']).iloc[:, 
 df_recovered_t = df_recovered.set_index(['Province/State', 'Country/Region']).iloc[:, 2:].T
 
 # Convert column names to strings before using `.str.split()`
-df_confirmed_t.columns = df_confirmed_t.columns.astype(str).str.split("|", n=1).str[-1]
-df_deaths_t.columns = df_deaths_t.columns.astype(str).str.split("|", n=1).str[-1]
-df_recovered_t.columns = df_recovered_t.columns.astype(str).str.split("|", n=1).str[-1]
+df_confirmed_t.columns = [' | '.join(map(str, col)) for col in df_confirmed_t.columns]
+df_deaths_t.columns = [' | '.join(map(str, col)) for col in df_deaths_t.columns]
+df_recovered_t.columns = [' | '.join(map(str, col)) for col in df_recovered_t.columns]
 
 # Ensure consistent datetime indexing
 df_confirmed_t.index = pd.to_datetime(df_confirmed_t.index)
