@@ -40,9 +40,9 @@ df_deaths_total = df_deaths.iloc[:, 4:].sum(axis=0)
 df_recovered_total = df_recovered.iloc[:, 4:].sum(axis=0)
 
 # Aligning data for consistent indexing
-df_confirmed_t = df_confirmed.set_index(df_confirmed.columns[4:]).T
-df_deaths_t = df_deaths.set_index(df_deaths.columns[4:]).T
-df_recovered_t = df_recovered.set_index(df_recovered.columns[4:]).T
+df_confirmed_t = df_confirmed.set_index(['Province/State', 'Country/Region']).iloc[:, 2:].T
+df_deaths_t = df_deaths.set_index(['Province/State', 'Country/Region']).iloc[:, 2:].T
+df_recovered_t = df_recovered.set_index(['Province/State', 'Country/Region']).iloc[:, 2:].T
 
 # Convert column names to strings before using `.str.split()`
 df_confirmed_t.columns = df_confirmed_t.columns.astype(str).str.split("|", n=1).str[-1]
